@@ -108,6 +108,24 @@ static void error_multiple_argument_taker_in_short_family (const char *opt, cons
 	exit(1);
 }
 
+static void error_missing_argument (void)
+{
+	const char *src =
+	"cxa::%s::fatal: missing argument\n"
+	" the '--%s' (%c) flag needs an argument but none was given\n";
+	fprintf(stderr, src, callerName, flagNeedsArg->longName, flagNeedsArg->shortName);
+	exit(1);
+}
+
+static void error_unknown_longname (const char *opt, const unsigned short len)
+{
+	const char *src =
+	"cxa::%s::fatal: unknown longname flag\n"
+	" the '--%.*s' is not defined by the program\n";
+	fprintf(stderr, src, callerName, len, opt);
+	exit(1);
+}
+
 static void init_shortnames_keys (void);
 static void check_names_are_ok (struct CxaFlag*);
 
@@ -116,6 +134,9 @@ static void handle_shortnames (const char*, const size_t, struct CxaFlag*);
 
 static void handle_freewords (const char*);
 static void add_positional_arg (const char*);
+
+static void make_sure_flag_has_its_arg(void);
+static void hanlde_longnames (const char*, const size_t, struct CxaFlag*);
 
 void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv, const unsigned long posArgsFactor)
 {
@@ -142,18 +163,24 @@ void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int ar
 
 		if (endOfFlags)
 		{
+			add_positional_arg(option);
+			continue;
 		}
 		else if (length == 2 && *option == '-' && option[1] == '-')
 		{
+			endOfFlags = 1;
 		}
 		else if (length  > 2 && *option == '-' && option[1] == '-')
 		{
+			make_sure_flag_has_its_arg();
+			hanlde_longnames(option, length, flags);
 		}
 		else if (length == 1 && *option == '-')
 		{
 		}
 		else if (length > 1 && *option == '-')
 		{
+			make_sure_flag_has_its_arg();
 			handle_shortnames(option, length, flags);
 		}
 		else
@@ -161,6 +188,7 @@ void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int ar
 			handle_freewords(option);
 		}
 	}
+	make_sure_flag_has_its_arg();
 }
 
 /* This function is intended to be use only to inspect the flags and then
@@ -266,7 +294,45 @@ static void add_positional_arg (const char *arg)
 	CxaPositional.args[CxaPositional.len++] = (char*) arg;
 }
 
-// TODO: make sure flagNeedsArg has its argument before taking another flag into account
+static void make_sure_flag_has_its_arg (void)
+{
+	if (flagNeedsArg != NULL && flagNeedsArg->needs == CXA_FLAG_NEEDS_ARG_YES && flagNeedsArg->argument == NULL)
+	{
+		error_missing_argument();
+	}
+}
+
+static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag *flags)
+{
+	const char *nodashes = opt + 2;
+	char *possibleArg    = NULL;
+
+	unsigned short flagNameLen = 0;
+
+	for (size_t i = 0; nodashes[i]; i++)
+	{
+		if (nodashes[i] == '=') { possibleArg = nodashes + i + 1; break; }
+		flagNameLen++;
+	}
+
+	for (unsigned short i = 0; flags[i].longName; i++)
+	{
+		struct CxaFlag *flag = &flags[i];
+		if (flag->seen == CXA_FLAG_WAS_SEEN) { return; }
+
+		const unsigned short thisLen = strlen(flag->longName);
+
+		if (!strncmp(nodashes, flag->longName, (flagNameLen <  thisLen) ? flagNameLen : thisLen))
+		{
+			flagNeedsArg = flag;
+			flag->seen = CXA_FLAG_WAS_SEEN;
+
+			if (possibleArg) { flag->argument = possibleArg; }
+			return;
+		}
+	}
+	error_unknown_longname(nodashes, flagNameLen);
+}
 
 #endif
 
