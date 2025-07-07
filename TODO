@@ -1,0 +1,11 @@
+
+	[x] Check for duplicated ID's
+	[ ] Check for duplicated longnames
+	[ ] Handle short names
+	[ ] Handle long names
+	[ ] Hanle positional arguments
+	[ ] Handle --flag=argument
+	[ ] Support self documented
+	[ ] Good erHandle ror handler
+	[ ] Support source C as well
+

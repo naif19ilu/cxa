@@ -38,16 +38,16 @@ struct CxaFlag
 /* Indicates the number of flags the programmer
  * has defined (flags array length)
  */
-static unsigned short cxa__totalNoFlags = 0;
+static unsigned short totalNoFlags = 0;
 
 /* Array for quick access to flags depending on their
- * shortname cxa__quickShortNames[id] = where the flag
+ * shortname quickShortNames[id] = where the flag
  * is defined within flags array.
  */
-static unsigned short cxa__quickShortNames[26 * 2 + 10] = {0};
+static short quickShortNames[26 * 2 + 10] = {0};
 
 /* For better error messages */
-static char *cxa__programsName;
+static char *programsName;
 
 void cxa_parse_arguments (char*, struct CxaFlag*, const int, char**);
 
@@ -66,35 +66,37 @@ void cxa_parse_arguments (char*, struct CxaFlag*, const int, char**);
  * organized since there's no way to encapsulate the error functions...
  */
 
-
-/* Actual parser, all from above is error handling
+/* Actual parser starts from here, all from above is error handling
+ * messages
  */
 static short get_quick_shortname_key (const char id)
 {
 	if (isdigit(id)) { return id - '0'; }
 	if (isupper(id)) { return id - 'A' + 10; }
-	if (islower(id)) { return id - 'a' - 36; }
+	if (islower(id)) { return id - 'a' + 36; }
 	return -1;
 }
 
 static void get_number_of_flags (struct CxaFlag *flags)
 {
 	for (unsigned short i = 0; flags[i].longname != NULL; i++)
-		cxa__totalNoFlags++;
+		totalNoFlags++;
 }
 
 static void check_correct_shortname_usages (struct CxaFlag *flags)
 {
-	for (unsigned short i = 0; i < cxa__totalNoFlags; i++)
+	for (unsigned short i = 0; i < totalNoFlags; i++)
 	{
 		const short key = get_quick_shortname_key(flags[i].shortname);
-		assert(key != -1 && "PROGRAMMER, PLEASE USE ONLY [a-zA-Z0-9] shortnames!");
+		assert(key != -1 && "PROGRAMMER: PLEASE USE ONLY [a-zA-Z0-9] SHORTNAMES!");
+		assert(quickShortNames[key] == 0 && "PROGRAMMER: THERE'S A DUPLICATED ID!");
+		quickShortNames[key] = i + 1;
 	}
 }
 
 void cxa_parse_arguments (char *programsName, struct CxaFlag *flags, const int argc, char **argv)
 {
-	cxa__programsName = programsName;
+	programsName = programsName;
 	get_number_of_flags(flags);
 	check_correct_shortname_usages(flags);
 }
