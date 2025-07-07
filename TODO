@@ -1,7 +1,7 @@
 
 	[x] Check for duplicated ID's
 	[x] Check for duplicated longnames
-	[ ] Handle short names
+	[x] Handle short names
 	[ ] Handle long names
 	[ ] Hanle positional arguments
 	[ ] Handle --flag=argument

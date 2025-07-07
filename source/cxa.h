@@ -30,6 +30,8 @@ struct
 {
 	struct CxaFlag **flags;
 	char **itsArgs;
+	unsigned short noFlags;
+	unsigned short noArgs;
 } CxaAns;
 
 void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**);
@@ -61,12 +63,6 @@ static char *programsName = NULL;
  * takes an argument even if its mandatory or likely (YES or MAY)
  */
 static struct CxaFlag *lastSeen = NULL;
-
-/* These two work to index both 'flags' and 'itsArgs'
- * field of the 'CxaAns' structure
- */
-static unsigned short noFlagsSeen = 0;
-static unsigned short noArgsSaved = 0;
 
 static void error_invalid_shortname (const char *argument, const char shortname)
 {
@@ -182,7 +178,7 @@ static void handle_shortnames (struct CxaFlag *flags, const char *arg, const siz
 
 		if (lastSeen != NULL && flag->needs != CXA_FLAG_NEEDS_ARG_NON) { error_multiple_argshortnames(arg + 1, lastSeen->shortname, shortname); }
 		if (flag->needs != CXA_FLAG_NEEDS_ARG_NON) { lastSeen = flag; }
-		CxaAns.flags[noFlagsSeen++] = flag;
+		CxaAns.flags[CxaAns.noFlags++] = flag;
 	}
 }
 
