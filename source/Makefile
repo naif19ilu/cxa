@@ -2,7 +2,7 @@
 # Jul 6, 2025
 # Makefile :)
 
-OBJS = tester.o cxa.o
+OBJS = tester.o
 FLAGS = -Wall -Wextra -Wpedantic
 NAME = cxa
 

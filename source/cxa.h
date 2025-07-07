@@ -35,6 +35,17 @@ struct CxaFlag
 	enum CxaFlagArgument needs;
 };
 
+/* Indicates the number of flags the programmer
+ * has defined (flags array length)
+ */
+static unsigned short cxa__totalNoFlags = 0;
+
+/* Array for quick access to flags depending on their
+ * shortname cxa__quickShortNames[id] = where the flag
+ * is defined within flags array.
+ */
+static unsigned short cxa__quickShortNames[26 * 2 + 10] = {0};
+
 void cxa_parse_arguments (struct CxaFlag*, const int, char**);
 
 #ifdef __cplusplus
@@ -44,6 +55,17 @@ void cxa_parse_arguments (struct CxaFlag*, const int, char**);
 
 #ifdef CXA_HEADER_ONLY
 
-/* TODO */
+#include <stdio.h>
+
+static void get_number_of_flags (struct CxaFlag *flags)
+{
+	for (unsigned short i = 0; flags[i].longname != NULL; i++)
+		cxa__totalNoFlags++;
+}
+
+void cxa_parse_arguments (struct CxaFlag *flags, const int argc, char **argv)
+{
+	get_number_of_flags(flags);
+}
 
 #endif

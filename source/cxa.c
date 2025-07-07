@@ -6,8 +6,4 @@
 #include "cxa.h"
 #include <stdio.h>
 
-void cxa_parse_arguments (struct CxaFlag *flags, const int argc, char **argv)
-{
-	printf("%d\n", flags[0].needs);
-}
-
+/* TODO */
