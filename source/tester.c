@@ -9,5 +9,14 @@
 
 int main (int argc, char **argv)
 {
+	struct CxaFlag flags[] =
+	{
+		{"document", 'd', CXA_FLAG_NEEDS_ARG_YES},
+		{"usage",    'u', CXA_FLAG_NEEDS_ARG_MAY},
+		{"verbose",  'v', CXA_FLAG_NEEDS_ARG_NON},
+		CXA_FINAL_FLAG
+	};
+
+	cxa_parse("tester", flags, (unsigned int) argc, argv);
 	return 0;
 }
