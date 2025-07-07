@@ -30,7 +30,16 @@ struct CxaFlag
 	enum CxaFlagSeen seen;
 };
 
-void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**);
+struct
+{
+	char          **args;
+	unsigned long len;
+	unsigned long cap;
+	unsigned long factor;
+} CxaPositional;
+
+void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**, const unsigned long);
+void cxa_debug (struct CxaFlag*);
 
 #ifdef __cplusplus
 }
@@ -105,10 +114,19 @@ static void check_names_are_ok (struct CxaFlag*);
 static short get_quick_access_key (const char);
 static void handle_shortnames (const char*, const size_t, struct CxaFlag*);
 
-void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv)
+static void handle_freewords (const char*);
+static void add_positional_arg (const char*);
+
+void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv, const unsigned long posArgsFactor)
 {
 	init_shortnames_keys();
 	check_names_are_ok(flags);
+
+	CxaPositional.cap    = posArgsFactor;
+	CxaPositional.factor = posArgsFactor;
+	CxaPositional.len    = 0;
+	CxaPositional.args   = (char**) calloc(CxaPositional.cap, sizeof(char*));
+	assert(CxaPositional.args && "SYSTEM: cannot allocate memory");
 
 	callerName = (char*) caller;
 
@@ -140,8 +158,30 @@ void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int ar
 		}
 		else
 		{
+			handle_freewords(option);
 		}
 	}
+}
+
+/* This function is intended to be use only to inspect the flags and then
+ * exit the program. The output is not the best looking so you better pipe
+ * this function output to column command for better looking: ... | column -t -s '-'
+ */
+void cxa_debug (struct CxaFlag *flags)
+{
+	printf("Flags\n");
+	for (unsigned int i = 0; flags[i].longName; i++)
+	{
+		struct CxaFlag *f = &flags[i];
+		printf("  %s - %c - %s - %s\n", f->longName, f->shortName, f->desc, (f->argument) ? f->argument : "NO_ARG");
+	}
+
+	printf("Positional\n");
+	for (unsigned long i = 0; i < CxaPositional.len; i++)
+	{
+		printf("  %ld. - %s\n", i, CxaPositional.args[i]);
+	}
+	exit(0);
 }
 
 static void init_shortnames_keys (void)
@@ -206,6 +246,27 @@ static void handle_shortnames (const char *opt, const size_t len, struct CxaFlag
 		flag->seen = CXA_FLAG_WAS_SEEN;
 	}
 }
+
+static void handle_freewords (const char *opt)
+{
+	if (flagNeedsArg == NULL) { add_positional_arg(opt); return; }
+
+	flagNeedsArg->argument = (char*) opt;
+	flagNeedsArg = NULL;
+}
+
+static void add_positional_arg (const char *arg)
+{
+	if (CxaPositional.len == CxaPositional.cap)
+	{
+		CxaPositional.cap += CxaPositional.factor;
+		CxaPositional.args = (char**) reallocarray(CxaPositional.args, CxaPositional.cap, sizeof(char**));
+		assert(CxaPositional.args && "SYSTEM: cannot reallocate memory");
+	}
+	CxaPositional.args[CxaPositional.len++] = (char*) arg;
+}
+
+// TODO: make sure flagNeedsArg has its argument before taking another flag into account
 
 #endif
 
