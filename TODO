@@ -1,6 +1,6 @@
 
 	[x] Check for duplicated ID's
-	[ ] Check for duplicated longnames
+	[x] Check for duplicated longnames
 	[ ] Handle short names
 	[ ] Handle long names
 	[ ] Hanle positional arguments

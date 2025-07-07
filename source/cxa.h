@@ -60,6 +60,7 @@ void cxa_parse_arguments (char*, struct CxaFlag*, const int, char**);
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include <assert.h>
 
 /* Error handling is harder to do in C, at least try to keep it
@@ -89,8 +90,17 @@ static void check_correct_shortname_usages (struct CxaFlag *flags)
 	{
 		const short key = get_quick_shortname_key(flags[i].shortname);
 		assert(key != -1 && "PROGRAMMER: PLEASE USE ONLY [a-zA-Z0-9] SHORTNAMES!");
+
 		assert(quickShortNames[key] == 0 && "PROGRAMMER: THERE'S A DUPLICATED ID!");
 		quickShortNames[key] = i + 1;
+
+		const char *thisName = flags[i].longname;
+		const size_t nbytes = strlen(thisName);
+
+		for (unsigned int short j = 0; j < i; j++)
+		{
+			assert(strncmp(thisName, flags[j].longname, nbytes) && "PROGRAMMER: THERE'S A DUPLICATED LONGNAME");
+		}
 	}
 }
 
