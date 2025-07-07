@@ -34,7 +34,7 @@ int main (int argc, char **argv)
 		CXA_FINAL_FLAG
 	};
 
-	cxa_parse(flag, (unsigned int) argc, argv);
+	cxa_parse("tester", flag, (unsigned int) argc, argv);
 
 	return 0;
 }
