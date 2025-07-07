@@ -1,49 +1,49 @@
 /*
- * cxa - C executable arguments parser
+ * Cxa - Command line argument parser for C
  * Jul 6, 2025
- * Definitions and implementation
- *
- * If the programmer only wants to use the header file they'll
- * have to define CXA_ONLY_HEADER before including cxa.h in their
- * main file, like this:
- *
- * #define CXA_ONLY_HEADER
- * #include "cxa.h"
- *
- * and do not include cxa.c in the compilation process in order
- * to avoid redefinitions
+ * cxa's defintions and source code if wanted
  */
 #ifndef CXA_H
 #define CXA_H
 
-#define CXA_FINAL_FLAG	{NULL, NULL, '\0', 0}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-enum CxaFlagArg
+#define CXA_FINAL_FLAG {NULL, NULL, NULL, 0, 0, 0}
+
+enum CxaFlagSeen
 {
-	CXA_FLAG_ARG_YES,
-	CXA_FLAG_ARG_NON,
-	CXA_FLAG_ARG_MAY
+	CXA_NOT_SEEN = 0,
+	CXA_WAS_SEEN = 1,
+};
+
+enum CxaFlagArgument
+{
+	CXA_FLAG_ARGUMENT_NON = 0,
+	CXA_FLAG_ARGUMENT_MAY = 1,
+	CXA_FLAG_ARGUMENT_YES = 2
 };
 
 struct CxaFlag
 {
 	char *longname;
 	char *argument;
+	char *description;
 	char shortname;
-	enum CxaFlagArg hasArg;
+	enum CxaFlagSeen seen;
+	enum CxaFlagArgument needs;
 };
 
 void cxa_parse_arguments (struct CxaFlag*, const int, char**);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
-#ifdef CXA_ONLY_HEADER
+#ifdef CXA_HEADER_ONLY
 
-#include <stdio.h>
-
-void cxa_parse_arguments (struct CxaFlag *flags, const int argc, char **argv)
-{
-	printf("hello world from header\n");
-}
+/* TODO */
 
 #endif
