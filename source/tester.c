@@ -17,11 +17,10 @@ int main (int argc, char **argv)
 		CXA_FINAL_FLAG
 	};
 
-	cxa_parse("tester", flags, (unsigned int) argc, argv);
-
-	for (unsigned short i = 0; i < CxaAns.noFlags; i++)
+	cxa_init("tester", argc, argv, flags);
+	while (cxa_next() != 0)
 	{
-		printf("seen: %s\n", CxaAns.flags[i]->longname);
 	}
+
 	return 0;
 }
