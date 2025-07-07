@@ -94,12 +94,11 @@ static void check_correct_shortname_usages (struct CxaFlag *flags)
 		assert(quickShortNames[key] == 0 && "PROGRAMMER: THERE'S A DUPLICATED ID!");
 		quickShortNames[key] = i + 1;
 
-		const char *thisName = flags[i].longname;
-		const size_t nbytes = strlen(thisName);
-
-		for (unsigned int short j = 0; j < i; j++)
+		const char *name = flags[i].longname;
+		for (unsigned short j = 0; j < i; j++)
 		{
-			assert(strncmp(thisName, flags[j].longname, nbytes) && "PROGRAMMER: THERE'S A DUPLICATED LONGNAME");
+			/* Null-byte character is guaranteed since they are hard coded strings */
+			assert(strcmp(name, flags[j].longname) != 0 && "PROGRAMMER: THERE'S A DUPLICATED LONGNAME");
 		}
 	}
 }
