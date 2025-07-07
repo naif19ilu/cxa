@@ -46,7 +46,10 @@ static unsigned short cxa__totalNoFlags = 0;
  */
 static unsigned short cxa__quickShortNames[26 * 2 + 10] = {0};
 
-void cxa_parse_arguments (struct CxaFlag*, const int, char**);
+/* For better error messages */
+static char *cxa__programsName;
+
+void cxa_parse_arguments (char*, struct CxaFlag*, const int, char**);
 
 #ifdef __cplusplus
 }
@@ -56,6 +59,23 @@ void cxa_parse_arguments (struct CxaFlag*, const int, char**);
 #ifdef CXA_HEADER_ONLY
 
 #include <stdio.h>
+#include <ctype.h>
+#include <assert.h>
+
+/* Error handling is harder to do in C, at least try to keep it
+ * organized since there's no way to encapsulate the error functions...
+ */
+
+
+/* Actual parser, all from above is error handling
+ */
+static short get_quick_shortname_key (const char id)
+{
+	if (isdigit(id)) { return id - '0'; }
+	if (isupper(id)) { return id - 'A' + 10; }
+	if (islower(id)) { return id - 'a' - 36; }
+	return -1;
+}
 
 static void get_number_of_flags (struct CxaFlag *flags)
 {
@@ -63,9 +83,20 @@ static void get_number_of_flags (struct CxaFlag *flags)
 		cxa__totalNoFlags++;
 }
 
-void cxa_parse_arguments (struct CxaFlag *flags, const int argc, char **argv)
+static void check_correct_shortname_usages (struct CxaFlag *flags)
 {
+	for (unsigned short i = 0; i < cxa__totalNoFlags; i++)
+	{
+		const short key = get_quick_shortname_key(flags[i].shortname);
+		assert(key != -1 && "PROGRAMMER, PLEASE USE ONLY [a-zA-Z0-9] shortnames!");
+	}
+}
+
+void cxa_parse_arguments (char *programsName, struct CxaFlag *flags, const int argc, char **argv)
+{
+	cxa__programsName = programsName;
 	get_number_of_flags(flags);
+	check_correct_shortname_usages(flags);
 }
 
 #endif
