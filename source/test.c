@@ -35,6 +35,8 @@ int main (int argc, char **argv)
 	};
 
 	cxa_parse("tester", flag, (unsigned int) argc, argv, 16);
+
+	cxa_debug(flag);
 	cxa_document(flag, "powerful CLI argument parser");
 
 	return 0;

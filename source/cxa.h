@@ -42,12 +42,6 @@ void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**, const 
 void cxa_debug (struct CxaFlag*);
 void cxa_document (struct CxaFlag*, const char*);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
-
 /*
  *  ________________
  * < implementation >
@@ -59,8 +53,6 @@ void cxa_document (struct CxaFlag*, const char*);
  *      | O . O|
  *       \_____/
  */
-#ifdef CXA_HEADER_ONLY
-
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
@@ -361,14 +353,20 @@ static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag 
 
 		if (!strncmp(nodashes, flag->longName, (flagNameLen <  thisLen) ? flagNameLen : thisLen))
 		{
-			flagNeedsArg = flag;
+			const unsigned char flagTakesArg = (flag->needs != CXA_FLAG_NEEDS_ARG_NON) ? 1 : 0;
+			if (flagTakesArg) { flagNeedsArg = flag; }
+
 			flag->seen = CXA_FLAG_WAS_SEEN;
 
-			if (possibleArg) { flag->argument = possibleArg; }
+			if (possibleArg && flagTakesArg) { flag->argument = possibleArg; }
 			return;
 		}
 	}
 	error_unknown_longname(nodashes, flagNameLen);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
