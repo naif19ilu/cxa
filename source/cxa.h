@@ -40,6 +40,7 @@ struct
 
 void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**, const unsigned long);
 void cxa_debug (struct CxaFlag*);
+void cxa_document (struct CxaFlag*, const char*);
 
 #ifdef __cplusplus
 }
@@ -65,6 +66,8 @@ void cxa_debug (struct CxaFlag*);
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define MAX(a, b)   ((a) > (b) ? (a) : (b))
 
 /* Quick way to acess flags depending of their shortname
  */
@@ -212,6 +215,40 @@ void cxa_debug (struct CxaFlag *flags)
 	exit(0);
 }
 
+void cxa_document (struct CxaFlag *flags, const char *pdesc)
+{
+	printf("\n\x1b[1mUsage\x1b[0m: %s - %s\n\n", callerName, pdesc);
+	printf("flags:\n");
+
+	unsigned short largestName = 0;
+	unsigned short largestDesc = 0;
+
+	for (unsigned int i = 0; flags[i].longName; i++)
+	{
+		largestName = MAX(largestName, strlen(flags[i].longName));
+		largestDesc = MAX(largestDesc, strlen(flags[i].desc    ));
+	}
+
+	largestName += 2;
+	largestDesc += 2;
+
+	static const char *const enum2string[] =
+	{
+		"no-argument",
+		"optional-argument",
+		"needs-argument"
+	};
+
+	for (unsigned int i = 0; flags[i].longName; i++)
+	{
+		printf("  \x1b[2m-\x1b[0m%c or \x1b[2m--\x1b[0m%-*s%-*s(%s)\n",
+		flags[i].shortName, largestName, flags[i].longName,
+		largestDesc, flags[i].desc, enum2string[flags[i].needs]);
+	}
+
+	putchar(10);
+}
+
 static void init_shortnames_keys (void)
 {
 	const unsigned short lim = 26 * 2 + 10;
@@ -335,4 +372,3 @@ static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag 
 }
 
 #endif
-

@@ -10,7 +10,7 @@ int main (int argc, char **argv)
 		{
 			"document",
 			"file to work with",
-			NULL,
+			"something random",
 			'd',
 			CXA_FLAG_NEEDS_ARG_YES,
 			CXA_FLAG_NOT_SEEN
@@ -35,7 +35,7 @@ int main (int argc, char **argv)
 	};
 
 	cxa_parse("tester", flag, (unsigned int) argc, argv, 16);
-	cxa_debug(flag);
+	cxa_document(flag, "powerful CLI argument parser");
 
 	return 0;
 }

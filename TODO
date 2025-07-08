@@ -5,7 +5,6 @@
 	[x] Handle long names
 	[x] Hanle positional arguments
 	[x] Handle --flag=argument
-	[ ] Support self documented
-	[ ] Good erHandle ror handler
+	[x] Support self documented
 	[ ] Support source C as well
 
