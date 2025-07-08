@@ -1,0 +1,24 @@
+
+    Cxa - C executable arguments parser
+
+    This is a lightweight argument parser for C programs, it
+    is inspired in the 'getopt' header found in glibc.
+
+    It allows the programmer to define flags their programs
+    may need by assigning a full-name, id, either it requires
+    arguments, if it does not or if it is optional, also allows
+    the programmer to set default values to the flags and jxa
+    also offers a simple way to display the whole program's usage
+    (see JxaDoc class)
+
+    --flag <argument>      long option with separate argument
+    --flag=argument        long option with attached argument
+    -f argument            short option with argument
+    -abc                   grouped short options
+    --                     end of flag parsing (everything after is positional)
+
+    For better understanding please see 'tester.c' and play around
+    with it :)
+
+    naif19ta
+    Jul 7 2025

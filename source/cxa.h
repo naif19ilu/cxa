@@ -1,3 +1,8 @@
+/*
+ * Cxa - C executable arguments parser
+ * Jul 7, 2025
+ * Main and unique file
+ */
 #ifndef CXA_H
 #define CXA_H
 
@@ -172,6 +177,7 @@ void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int ar
 		}
 		else if (length == 1 && *option == '-')
 		{
+			// TODO
 		}
 		else if (length > 1 && *option == '-')
 		{
@@ -196,13 +202,13 @@ void cxa_debug (struct CxaFlag *flags)
 	for (unsigned int i = 0; flags[i].longName; i++)
 	{
 		struct CxaFlag *f = &flags[i];
-		printf("  %s - %c - %s - %s\n", f->longName, f->shortName, f->desc, (f->argument) ? f->argument : "NO_ARG");
+		printf("  %s:%c:%d:%s\n", f->longName, f->shortName, f->seen, (f->argument) ? f->argument : "NO_ARG");
 	}
 
 	printf("Positional\n");
 	for (unsigned long i = 0; i < CxaPositional.len; i++)
 	{
-		printf("  %ld. - %s\n", i, CxaPositional.args[i]);
+		printf("  %ld.:%s\n", i, CxaPositional.args[i]);
 	}
 	exit(0);
 }
@@ -358,7 +364,7 @@ static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag 
 
 			flag->seen = CXA_FLAG_WAS_SEEN;
 
-			if (possibleArg && flagTakesArg) { flag->argument = possibleArg; }
+			if (possibleArg && flagTakesArg) { flag->argument = possibleArg; flagNeedsArg = NULL; }
 			return;
 		}
 	}
