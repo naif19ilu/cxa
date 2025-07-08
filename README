@@ -9,7 +9,7 @@
     arguments, if it does not or if it is optional, also allows
     the programmer to set default values to the flags and cxa
     also offers a simple way to display the whole program's usage
-	(see `cxa_document` function).
+    (see `cxa_document` function).
 
     --flag <argument>      long option with separate argument
     --flag=argument        long option with attached argument
