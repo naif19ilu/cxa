@@ -7,9 +7,9 @@
     It allows the programmer to define flags their programs
     may need by assigning a full-name, id, either it requires
     arguments, if it does not or if it is optional, also allows
-    the programmer to set default values to the flags and jxa
+    the programmer to set default values to the flags and cxa
     also offers a simple way to display the whole program's usage
-    (see JxaDoc class)
+	(see `cxa_document` function).
 
     --flag <argument>      long option with separate argument
     --flag=argument        long option with attached argument
