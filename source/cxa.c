@@ -1,5 +1,6 @@
 #include "cxa.h"
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -132,6 +133,7 @@ struct Cxa *cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *
 
 void cxa_print_usage (const char *desc, const struct CxaFlag *flags)
 {
+
 }
 
 void cxa_clean (struct Cxa *cxa)
@@ -247,6 +249,7 @@ static void handle_freeword (const char *word, struct Cxa *cxa)
 	}
 
 	assert(LastSeen->destination != NULL && "NO DESTINATION ASSIGNED FOR A FLAG");
+	errno = 0;
 
 	switch (LastSeen->argtype)
 	{
@@ -258,7 +261,10 @@ static void handle_freeword (const char *word, struct Cxa *cxa)
 		case CXA_FLAG_ARG_TYPE_DBL: *(double*) LastSeen->destination = (double) strtod(word, NULL);    break;
 	}
 
-	// XXX: check errors
+	if (errno != 0)
+	{
+		error_missing_argument(LastSeen->longname, LastSeen->shortname, LastSeen->argtype);
+	}
 
 	LastSeen->argiven = CXA_FLAG_ARG_GIVEN_YES;
 	LastSeen = NULL;

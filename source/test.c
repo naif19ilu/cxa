@@ -28,7 +28,9 @@ int main (int argc, char **argv)
 	};
 
 
-	cxa_execute((unsigned char) argc, argv, flags, "test");
+	struct Cxa *cxa = cxa_execute((unsigned char) argc, argv, flags, "test");
 	printf("%d : %d\n", p.nopages, p.nooptmz);
+
+	cxa_clean(cxa);
 	return 0;
 }
