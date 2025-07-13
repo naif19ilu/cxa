@@ -272,10 +272,13 @@ static void handle_long_flag (struct CxaFlag *flags, const char *given)
 
 		if (!strncmp(given, flags[i].longname, cmp))
 		{
-			LastSeen = &flags[i];
-			LastSeen->meta |= CXA_FLAG_WAS_SEEN;
+			flags[i].meta |= CXA_FLAG_WAS_SEEN;
 
-			if (followedArgument)
+			if ((flags[i].meta & CXA_FLAG_TAKER_MASK) != CXA_FLAG_ARG_GIVEN_NON)
+			{
+				LastSeen = &flags[i];
+			}
+			if (LastSeen && followedArgument)
 			{
 				handle_freeword(followedArgument, NULL);
 			}
