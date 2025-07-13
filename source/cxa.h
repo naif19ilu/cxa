@@ -126,6 +126,14 @@ static void error_unknown_longname (const char *opt, const unsigned short len)
 	exit(1);
 }
 
+static void error_unsupported_stdin (void)
+{
+	const char *src =
+	"cxa::%s::fatal: '-' option is not supported\n";
+	fprintf(stderr, src, callerName);
+	exit(1);
+}
+
 static void init_shortnames_keys (void);
 static void check_names_are_ok (struct CxaFlag*);
 
@@ -136,7 +144,7 @@ static void handle_freewords (const char*);
 static void add_positional_arg (const char*);
 
 static void make_sure_flag_has_its_arg(void);
-static void hanlde_longnames (const char*, const size_t, struct CxaFlag*);
+static void hanlde_longnames (const char*, struct CxaFlag*);
 
 void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv, const unsigned long posArgsFactor)
 {
@@ -173,11 +181,11 @@ void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int ar
 		else if (length  > 2 && *option == '-' && option[1] == '-')
 		{
 			make_sure_flag_has_its_arg();
-			hanlde_longnames(option, length, flags);
+			hanlde_longnames(option, flags);
 		}
 		else if (length == 1 && *option == '-')
 		{
-			// TODO
+			error_unsupported_stdin();
 		}
 		else if (length > 1 && *option == '-')
 		{
@@ -337,7 +345,7 @@ static void make_sure_flag_has_its_arg (void)
 	}
 }
 
-static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag *flags)
+static void hanlde_longnames (const char *opt, struct CxaFlag *flags)
 {
 	const char *nodashes = opt + 2;
 	char *possibleArg    = NULL;
@@ -346,7 +354,7 @@ static void hanlde_longnames (const char *opt, const size_t len, struct CxaFlag 
 
 	for (size_t i = 0; nodashes[i]; i++)
 	{
-		if (nodashes[i] == '=') { possibleArg = nodashes + i + 1; break; }
+		if (nodashes[i] == '=') { possibleArg = (char*) nodashes + i + 1; break; }
 		flagNameLen++;
 	}
 
