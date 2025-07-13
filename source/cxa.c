@@ -53,14 +53,24 @@ static void error_undefined_longname (const char *name, const size_t length)
 	exit(EXIT_FAILURE);
 }
 
-static void error_missing_argument (const char *longname, const char shortname, const CxaFlagArgType type)
+static void error_missing_argument (const char *longname, const char shortname, const char meta)
 {
-	static const char *const typeNeeded[] = { "string", "character", "short", "integer", "long", "double" };
+	char *needed_t;
+
+	switch ((meta & CXA_ARG_TYPE_MASK))
+	{
+		case CXA_FLAG_ARG_TYPE_STR: needed_t = "string";    break; 
+		case CXA_FLAG_ARG_TYPE_CHR: needed_t = "character"; break;
+		case CXA_FLAG_ARG_TYPE_SHT: needed_t = "short";     break;
+		case CXA_FLAG_ARG_TYPE_INT: needed_t = "int";       break;
+		case CXA_FLAG_ARG_TYPE_LNG: needed_t = "long";      break;
+		case CXA_FLAG_ARG_TYPE_DBL: needed_t = "double";    break;
+	}
 
 	const char *const fmt =
 	"cxa:%s:\x1b[31merror:\x1b[0m missing argument\n"
 	"   '--%s' (%c) is missing its argument of type <%s>\n";
-	fprintf(stderr, fmt, Project, longname, shortname, typeNeeded[type]);
+	fprintf(stderr, fmt, Project, longname, shortname, needed_t);
 	exit(EXIT_FAILURE);
 }
 
@@ -158,7 +168,7 @@ void cxa_print_usage (const char *desc, const struct CxaFlag *flags)
 	{
 		printf("  \x1b[2m-\x1b[0m%c or \x1b[2m--\x1b[0m%-*s%-*s(%s)\n",
 		flags[i].shortname, largestname, flags[i].longname,
-		largestdesc, flags[i].description, enum2string[flags[i].has]);
+		largestdesc, flags[i].description, enum2string[flags[i].meta & CXA_FLAG_TAKER_MASK]);
 	}
 
 	putchar(10);
@@ -218,13 +228,15 @@ static void handle_short_flag (struct CxaFlag *flags, const char *given, const s
 		}
 
 		struct CxaFlag *flag = &flags[QuickInf[key][0]];
-		flag->seen = CXA_FLAG_WAS_SEEN;
+		flag->meta |= CXA_FLAG_WAS_SEEN;
 
-		if (flag->has != CXA_FLAG_TAKER_NON && LastSeen)
+		const bool takesArg = (flag->meta & CXA_FLAG_TAKER_MASK);
+
+		if (takesArg != CXA_FLAG_TAKER_NON && LastSeen)
 		{
 			error_multi_taker_in_group(LastSeen->shortname, name, given);
 		}
-		if (flag->has != CXA_FLAG_TAKER_NON)
+		if (takesArg != CXA_FLAG_TAKER_NON)
 		{
 			LastSeen = flag;
 		}
@@ -250,6 +262,8 @@ static void handle_long_flag (struct CxaFlag *flags, const char *given)
 		if (!strncmp(given, flags[i].longname, cmp))
 		{
 			LastSeen = &flags[i];
+			LastSeen->meta |= CXA_FLAG_WAS_SEEN;
+
 			if (followedArgument)
 			{
 				handle_freeword(followedArgument, NULL);
@@ -262,9 +276,9 @@ static void handle_long_flag (struct CxaFlag *flags, const char *given)
 
 static void check_flag_has_its_arg (void)
 {
-	if (LastSeen && LastSeen->argiven == CXA_FLAG_ARG_GIVEN_NON)
+	if (LastSeen && (LastSeen->meta & CXA_FLAG_ARG_GIVEN_MASK) == CXA_FLAG_ARG_GIVEN_NON)
 	{
-		error_missing_argument(LastSeen->longname, LastSeen->shortname, LastSeen->argtype);
+		error_missing_argument(LastSeen->longname, LastSeen->shortname, LastSeen->meta);
 	}
 }
 
@@ -279,7 +293,7 @@ static void handle_freeword (const char *word, struct Cxa *cxa)
 	assert(LastSeen->destination != NULL && "NO DESTINATION ASSIGNED FOR A FLAG");
 	errno = 0;
 
-	switch (LastSeen->argtype)
+	switch (LastSeen->meta & CXA_ARG_TYPE_MASK)
 	{
 		case CXA_FLAG_ARG_TYPE_STR: *(char**)  LastSeen->destination = (char*)  word;                  break;
 		case CXA_FLAG_ARG_TYPE_CHR: *(char*)   LastSeen->destination = (char)   *word;                 break;
@@ -291,10 +305,10 @@ static void handle_freeword (const char *word, struct Cxa *cxa)
 
 	if (errno != 0)
 	{
-		error_missing_argument(LastSeen->longname, LastSeen->shortname, LastSeen->argtype);
+		error_missing_argument(LastSeen->longname, LastSeen->shortname, LastSeen->meta);
 	}
 
-	LastSeen->argiven = CXA_FLAG_ARG_GIVEN_YES;
+	LastSeen->meta |= CXA_FLAG_ARG_GIVEN_YES;
 	LastSeen = NULL;
 }
 
@@ -303,7 +317,7 @@ static void store_positional_argument (struct Cxa *cxa, const char *pos)
 	if (cxa->len == cxa->cap)
 	{
 		cxa->cap += CXA_POS_ARGS_GROWTH_FAC;
-		cxa->positional = (char**) reallocarray(cxa->positional, cxa->cap, sizeof(char*));
+		cxa->positional = (char**) realloc(cxa->positional, cxa->cap * sizeof(char*));
 		assert(cxa->positional && "CANNOT ALLOC");
 	}
 	cxa->positional[cxa->len++] = (char*) pos;
