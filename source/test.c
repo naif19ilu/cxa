@@ -6,12 +6,24 @@
 #include "cxa.h"
 #include <stdio.h>
 
+struct Program
+{
+	int nopages;
+	int nooptmz;
+};
+
 int main (int argc, char **argv)
 {
-	static struct CxaFlag flags[] =
+	struct Program p =
 	{
-		CXA_SET_INT("pages", "no pages", NULL, CXA_FLAG_TAKER_YES, 'p'),
-		CXA_SET_INT("optmz", "no optmz", NULL, CXA_FLAG_TAKER_YES, 'o'),
+		.nopages = 0,
+		.nooptmz = 0
+	};
+
+	struct CxaFlag flags[] =
+	{
+		CXA_SET_INT("pages", "no pages", &p.nopages, CXA_FLAG_TAKER_YES, 'p'),
+		CXA_SET_INT("optmz", "no optmz", &p.nooptmz, CXA_FLAG_TAKER_YES, 'o'),
 		CXA_SET_END
 	};
 
