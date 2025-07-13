@@ -12,7 +12,7 @@
 /* Refers to the name of the major project which is making use of the
  * library, set on 'cxa_execute' function
  */
-static char *Project     = "unnamed";
+static char *Project = "unnamed";
 
 /* Refers to the last flag seen as long as the flag needs an argument
  * even if it is optional
@@ -23,6 +23,24 @@ static struct CxaFlag *LastSeen = NULL;
  * 1. Stores the longname length
  */
 static short QuickInf[26 * 2 + 10][2];
+
+static char *get_name_of_argtype (const CxaFlagMeta meta)
+{
+	if ((meta & CXA_FLAG_TAKER_MASK) == CXA_FLAG_ARG_GIVEN_NON)
+	{
+		return "";
+	}
+	switch ((meta & CXA_ARG_TYPE_MASK))
+	{
+		case CXA_FLAG_ARG_TYPE_STR: return "string";
+		case CXA_FLAG_ARG_TYPE_CHR: return "character";
+		case CXA_FLAG_ARG_TYPE_SHT: return "short";
+		case CXA_FLAG_ARG_TYPE_INT: return "int";
+		case CXA_FLAG_ARG_TYPE_LNG: return "long";
+		case CXA_FLAG_ARG_TYPE_DBL: return "double";
+	}
+	return NULL;
+}
 
 static void error_undefined_shortname (const char name, const char *group)
 {
@@ -53,24 +71,12 @@ static void error_undefined_longname (const char *name, const size_t length)
 	exit(EXIT_FAILURE);
 }
 
-static void error_missing_argument (const char *longname, const char shortname, const char meta)
+static void error_missing_argument (const char *longname, const char shortname, const CxaFlagMeta meta)
 {
-	char *needed_t;
-
-	switch ((meta & CXA_ARG_TYPE_MASK))
-	{
-		case CXA_FLAG_ARG_TYPE_STR: needed_t = "string";    break; 
-		case CXA_FLAG_ARG_TYPE_CHR: needed_t = "character"; break;
-		case CXA_FLAG_ARG_TYPE_SHT: needed_t = "short";     break;
-		case CXA_FLAG_ARG_TYPE_INT: needed_t = "int";       break;
-		case CXA_FLAG_ARG_TYPE_LNG: needed_t = "long";      break;
-		case CXA_FLAG_ARG_TYPE_DBL: needed_t = "double";    break;
-	}
-
 	const char *const fmt =
 	"cxa:%s:\x1b[31merror:\x1b[0m missing argument\n"
 	"   '--%s' (%c) is missing its argument of type <%s>\n";
-	fprintf(stderr, fmt, Project, longname, shortname, needed_t);
+	fprintf(stderr, fmt, Project, longname, shortname, get_name_of_argtype(meta));
 	exit(EXIT_FAILURE);
 }
 
@@ -157,18 +163,23 @@ void cxa_print_usage (const char *desc, const struct CxaFlag *flags)
 	largestname += 2;
 	largestdesc += 2;
 
-	static const char *const enum2string[] =
+	static const char *const argstr[] =
 	{
-		"no-argument",
-		"optional-argument",
-		"needs-argument"
+		"NON",
+		"MAY",
+		"YES"
 	};
 
 	for (unsigned int i = 0; flags[i].longname; i++)
 	{
-		printf("  \x1b[2m-\x1b[0m%c or \x1b[2m--\x1b[0m%-*s%-*s(%s)\n",
-		flags[i].shortname, largestname, flags[i].longname,
-		largestdesc, flags[i].description, enum2string[flags[i].meta & CXA_FLAG_TAKER_MASK]);
+		const CxaFlagMeta meta = flags[i].meta;
+
+		printf(
+			"  \x1b[2m-\x1b[0m%c or \x1b[2m--\x1b[0m%-*s%-*s(arg? %s-%s)\n",
+			flags[i].shortname, largestname, flags[i].longname,
+			largestdesc, flags[i].description, argstr[meta & CXA_FLAG_TAKER_MASK],
+			get_name_of_argtype(meta)
+		);
 	}
 
 	putchar(10);

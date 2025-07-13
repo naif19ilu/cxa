@@ -5,11 +5,6 @@
 extern "C" {
 #endif
 
-/* this flag must always be the last in your array to indicate
- * there's no more flags to be parsed
- */
-#define CXA_SET_END             {NULL}
-
 /* Specifies if the flag takes an argument
  * ex: --source=arg or -s arg
  */
@@ -54,6 +49,11 @@ extern "C" {
 #define CXA_SET_INT(l,d,D,t,s)   {l, d, D, (t | CXA_FLAG_ARG_TYPE_INT | CXA_FLAG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
 #define CXA_SET_LNG(l,d,D,t,s)   {l, d, D, (t | CXA_FLAG_ARG_TYPE_LNG | CXA_FLAG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
 #define CXA_SET_DBL(l,d,D,t,s)   {l, d, D, (t | CXA_FLAG_ARG_TYPE_DBL | CXA_FLAG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+
+/* this flag must always be the last in your array to indicate
+ * there's no more flags to be parsed
+ */
+#define CXA_SET_END             {NULL}
 
 /* Factor in which the positional arguments grows
  */
