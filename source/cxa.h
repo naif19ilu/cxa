@@ -43,6 +43,10 @@ extern "C" {
 #define CXA_FLAG_WASNT_SEEN     0
 #define CXA_FLAG_WAS_SEEN       1
 
+/* Factor in which the positional arguments grows
+ */
+#define CXA_POS_ARGS_GROWTH_FAC 32
+
 typedef unsigned char CxaFlagHasArg;
 typedef unsigned char CxaFlagArgType;
 typedef unsigned char CxaFlagWasSeen;
@@ -58,7 +62,7 @@ struct CxaFlag
 	char           shortname;
 };
 
-void cxa_execute (const int, char**, struct CxaFlag*, const char*);
+void cxa_execute (const unsigned char, char**, struct CxaFlag*, const char*);
 void cxa_print_usage (const char*, const struct CxaFlag*);
 
 #ifdef __cplusplus
