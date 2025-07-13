@@ -27,6 +27,8 @@ int main (int argc, char **argv)
 		CXA_SET_END
 	};
 
+
 	cxa_execute((unsigned char) argc, argv, flags, "test");
+	printf("%d : %d\n", p.nopages, p.nooptmz);
 	return 0;
 }

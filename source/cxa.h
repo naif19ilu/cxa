@@ -68,8 +68,17 @@ struct CxaFlag
 	char            shortname;
 };
 
-void cxa_execute (const unsigned char, char**, struct CxaFlag*, const char*);
+struct Cxa
+{
+	char          **positional;
+	char          *stdinOpt;
+	unsigned long len;
+	unsigned long cap;
+};
+
+struct Cxa *cxa_execute (const unsigned char, char**, struct CxaFlag*, const char*);
 void cxa_print_usage (const char*, const struct CxaFlag*);
+void cxa_clean (struct Cxa*);
 
 #ifdef __cplusplus
 }

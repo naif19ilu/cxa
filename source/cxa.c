@@ -65,7 +65,6 @@ static void error_missing_argument (const char *longname, const char shortname, 
 	exit(EXIT_FAILURE);
 }
 
-
 static void check_names (struct CxaFlag*);
 static short get_quick_access_for (const char);
 
@@ -73,10 +72,21 @@ static void handle_short_flag (struct CxaFlag*, const char*, const size_t);
 static void handle_long_flag (struct CxaFlag*, const char*);
 
 static void check_flag_has_its_arg (void);
-static void handle_freeword (const char*);
+static void handle_freeword (const char*, struct Cxa*);
 
-void cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *flags, const char *projectName)
+static void store_positional_argument (struct Cxa*, const char*);
+
+struct Cxa *cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *flags, const char *projectName)
 {
+	struct Cxa *cxa = (struct Cxa*) calloc(1, sizeof(struct Cxa));
+	cxa->positional = (char**)      calloc(CXA_POS_ARGS_GROWTH_FAC, sizeof(char*));
+	cxa->len        = 0;
+	cxa->cap        = CXA_POS_ARGS_GROWTH_FAC;
+	cxa->stdinOpt   = NULL;
+
+	assert(cxa && "CANNOT ALLOC");
+	assert(cxa->positional && "CANNOT ALLOC");
+
 	Project = (char*) projectName;
 	check_names(flags);
 
@@ -89,6 +99,8 @@ void cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *flags, 
 
 		if (endOfArgs)
 		{
+			handle_freeword(this, cxa);
+			continue;
 		}
 		else if (len == 2 && *this == '-' && this[1] == '-')
 		{
@@ -110,14 +122,22 @@ void cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *flags, 
 		}
 		else
 		{
-			handle_freeword(this);
+			handle_freeword(this, cxa);
 		}
 	}
+
 	check_flag_has_its_arg();
+	return cxa;
 }
 
 void cxa_print_usage (const char *desc, const struct CxaFlag *flags)
 {
+}
+
+void cxa_clean (struct Cxa *cxa)
+{
+	free(cxa->positional);
+	free(cxa);
 }
 
 static void check_names (struct CxaFlag *flags)
@@ -202,7 +222,7 @@ static void handle_long_flag (struct CxaFlag *flags, const char *given)
 			LastSeen = &flags[i];
 			if (followedArgument)
 			{
-				handle_freeword(followedArgument);
+				handle_freeword(followedArgument, NULL);
 			}
 			return;
 		}
@@ -218,10 +238,11 @@ static void check_flag_has_its_arg (void)
 	}
 }
 
-static void handle_freeword (const char *word)
+static void handle_freeword (const char *word, struct Cxa *cxa)
 {
 	if (LastSeen == NULL)
 	{
+		store_positional_argument(cxa, word);
 		return;
 	}
 
@@ -229,10 +250,10 @@ static void handle_freeword (const char *word)
 
 	switch (LastSeen->argtype)
 	{
-		case CXA_FLAG_ARG_TYPE_STR: *(char**)  LastSeen->destination = (char*) word;                   break;
-		case CXA_FLAG_ARG_TYPE_CHR: *(char*)   LastSeen->destination = (char) *word;                   break;
+		case CXA_FLAG_ARG_TYPE_STR: *(char**)  LastSeen->destination = (char*)  word;                  break;
+		case CXA_FLAG_ARG_TYPE_CHR: *(char*)   LastSeen->destination = (char)   *word;                 break;
 		case CXA_FLAG_ARG_TYPE_SHT: *(short*)  LastSeen->destination = (short)  strtol(word, NULL, 0); break;
-		case CXA_FLAG_ARG_TYPE_INT: *(int*)    LastSeen->destination =          strtol(word, NULL, 0); break;
+		case CXA_FLAG_ARG_TYPE_INT: *(int*)    LastSeen->destination = (int)    strtol(word, NULL, 0); break;
 		case CXA_FLAG_ARG_TYPE_LNG: *(long*)   LastSeen->destination = (long)   strtol(word, NULL, 0); break;
 		case CXA_FLAG_ARG_TYPE_DBL: *(double*) LastSeen->destination = (double) strtod(word, NULL);    break;
 	}
@@ -241,4 +262,15 @@ static void handle_freeword (const char *word)
 
 	LastSeen->argiven = CXA_FLAG_ARG_GIVEN_YES;
 	LastSeen = NULL;
+}
+
+static void store_positional_argument (struct Cxa *cxa, const char *pos)
+{
+	if (cxa->len == cxa->cap)
+	{
+		cxa->cap += CXA_POS_ARGS_GROWTH_FAC;
+		cxa->positional = (char**) reallocarray(cxa->positional, cxa->cap, sizeof(char*));
+		assert(cxa->positional && "CANNOT ALLOC");
+	}
+	cxa->positional[cxa->len++] = (char*) pos;
 }
