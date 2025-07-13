@@ -36,6 +36,8 @@ int main (int argc, char **argv)
 		printf("%s\n", cxa->positional[i]);
 	}
 
+	cxa_print_usage("description goes here", flags);
+
 	cxa_clean(cxa);
 	return 0;
 }

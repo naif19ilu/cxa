@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define MAX(a, b)   ((a) > (b) ? (a) : (b))
+
 /* Refers to the name of the major project which is making use of the
  * library, set on 'cxa_execute' function
  */
@@ -129,7 +131,37 @@ struct Cxa *cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *
 
 void cxa_print_usage (const char *desc, const struct CxaFlag *flags)
 {
+	printf("\n\x1b[1mUsage\x1b[0m: %s - %s %s\n", Project, __DATE__, __TIME__);
+	printf("%s\n\n", desc);
+	printf("flags:\n");
 
+	unsigned short largestname = 0;
+	unsigned short largestdesc = 0;
+
+	for (unsigned int i = 0; flags[i].longname; i++)
+	{
+		largestname = MAX(largestname, strlen(flags[i].longname));
+		largestdesc = MAX(largestdesc, strlen(flags[i].description));
+	}
+
+	largestname += 2;
+	largestdesc += 2;
+
+	static const char *const enum2string[] =
+	{
+		"no-argument",
+		"optional-argument",
+		"needs-argument"
+	};
+
+	for (unsigned int i = 0; flags[i].longname; i++)
+	{
+		printf("  \x1b[2m-\x1b[0m%c or \x1b[2m--\x1b[0m%-*s%-*s(%s)\n",
+		flags[i].shortname, largestname, flags[i].longname,
+		largestdesc, flags[i].description, enum2string[flags[i].has]);
+	}
+
+	putchar(10);
 }
 
 void cxa_clean (struct Cxa *cxa)
