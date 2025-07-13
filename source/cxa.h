@@ -18,7 +18,7 @@ extern "C" {
 /* this flag must always be the last in your array to indicate
  * there's no more flags to be parsed
  */
-#define CXA_SET_END
+#define CXA_SET_END             {NULL}
 
 /* Specifies if the flag takes an argument
  * ex: --source=arg or -s arg

@@ -34,17 +34,17 @@ static void check_names (struct CxaFlag *flags)
 	{
 		const char shortname = flags[i].shortname;
 		const char key       = get_quick_access_for(shortname);
-
+		
 		assert(key != -1 && "PROGRAMMER: INVALID SHORTNAME");
 		assert(QuickShortNameAccess[key] == -1 && "PROGRAMMER: REPEATED SHORTNAMES");
 
 		QuickShortNameAccess[key] = i;
 		const char *longname = flags[i].longname;
 
-		/*for (unsigned char j = i + 1; flags[j].longname; j++)
+		for (unsigned char j = i + 1; flags[j].longname; j++)
 		{
 			assert(strcmp(longname, flags[j].longname) != 0 && "PROGRAMMER: REPEATED LONGNAMES");
-		}*/
+		}
 	}
 }
 
