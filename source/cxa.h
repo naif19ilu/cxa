@@ -8,12 +8,12 @@ extern "C" {
 /* prettiest way to define a flag since defining the struct
  * by hand is too verbose
  */
-#define CXA_SET_STR(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_STR, 0, s}
-#define CXA_SET_CHR(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_CHR, 0, s}
-#define CXA_SET_SHT(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_SHT, 0, s}
-#define CXA_SET_INT(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_INT, 0, s}
-#define CXA_SET_LNG(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_LNG, 0, s}
-#define CXA_SET_DBL(l,d,D,h,s)   {l, d, D, 0, h, CXA_FLAG_ARG_TYPE_DBL, 0, s}
+#define CXA_SET_STR(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_STR | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+#define CXA_SET_CHR(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_CHR | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+#define CXA_SET_SHT(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_SHT | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+#define CXA_SET_INT(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_INT | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+#define CXA_SET_LNG(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_LNG | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
+#define CXA_SET_DBL(l,d,D,t,s)   {l, d, D, 0, (t | CXA_FLAG_ARG_TYPE_DBL | CXA_FLAG_ARG_WASNT_SEEN | CXA_FLAG_ARG_GIVEN_NON), s}
 
 /* this flag must always be the last in your array to indicate
  * there's no more flags to be parsed
