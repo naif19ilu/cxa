@@ -43,7 +43,7 @@ struct
 	unsigned long factor;
 } CxaPositional;
 
-void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**, const unsigned long);
+void cxa_parse (const char*, struct CxaFlag*, const unsigned int, char**);
 void cxa_debug (struct CxaFlag*);
 void cxa_document (struct CxaFlag*, const char*);
 
@@ -64,7 +64,8 @@ void cxa_document (struct CxaFlag*, const char*);
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX(a, b)   ((a) > (b) ? (a) : (b))
+#define MAX(a, b)                    ((a) > (b) ? (a) : (b))
+#define CXA_POSITIONAL_ARGS_FACTOR   16
 
 /* Quick way to acess flags depending of their shortname
  */
@@ -146,13 +147,13 @@ static void add_positional_arg (const char*);
 static void make_sure_flag_has_its_arg(void);
 static void hanlde_longnames (const char*, struct CxaFlag*);
 
-void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv, const unsigned long posArgsFactor)
+void cxa_parse (const char *caller, struct CxaFlag *flags, const unsigned int argc, char **argv)
 {
 	init_shortnames_keys();
 	check_names_are_ok(flags);
 
-	CxaPositional.cap    = posArgsFactor;
-	CxaPositional.factor = posArgsFactor;
+	CxaPositional.cap    = CXA_POSITIONAL_ARGS_FACTOR;
+	CxaPositional.factor = CXA_POSITIONAL_ARGS_FACTOR;
 	CxaPositional.len    = 0;
 	CxaPositional.args   = (char**) calloc(CxaPositional.cap, sizeof(char*));
 	assert(CxaPositional.args && "SYSTEM: cannot allocate memory");
