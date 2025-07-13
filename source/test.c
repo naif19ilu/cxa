@@ -31,6 +31,11 @@ int main (int argc, char **argv)
 	struct Cxa *cxa = cxa_execute((unsigned char) argc, argv, flags, "test");
 	printf("%d : %d\n", p.nopages, p.nooptmz);
 
+	for (unsigned long i = 0; i < cxa->len; i++)
+	{
+		printf("%s\n", cxa->positional[i]);
+	}
+
 	cxa_clean(cxa);
 	return 0;
 }

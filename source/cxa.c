@@ -53,11 +53,7 @@ static void error_undefined_longname (const char *name, const size_t length)
 
 static void error_missing_argument (const char *longname, const char shortname, const CxaFlagArgType type)
 {
-	static const char *const typeNeeded[] =
-	{
-		"string", "character", "short", "integer",
-		"long", "double"
-	};
+	static const char *const typeNeeded[] = { "string", "character", "short", "integer", "long", "double" };
 
 	const char *const fmt =
 	"cxa:%s:\x1b[31merror:\x1b[0m missing argument\n"
