@@ -1,8 +1,3 @@
-/*
- * Cxa - C executable arguments parser
- * Jul 7, 2025
- * Main and unique file
- */
 #ifndef CXA_H
 #define CXA_H
 
