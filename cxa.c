@@ -66,7 +66,7 @@ static void error_undefined_longname (const char *name, const size_t length)
 {
 	const char *const fmt =
 	"cxa:%s:\x1b[31merror:\x1b[0m undefined flag provided\n"
-	"   '--%*s' cannot be recognized as a program's argument\n";
+	"   '--%.*s' cannot be recognized as a program's argument\n";
 	fprintf(stderr, fmt, Project, (int) length, name);
 	exit(EXIT_FAILURE);
 }
