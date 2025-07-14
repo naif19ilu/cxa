@@ -264,13 +264,11 @@ static void handle_long_flag (struct CxaFlag *flags, const char *given)
 		if (given[length] == '=') { followedArgument = ((char*) given) + length + 1; break; }
 	}
 
-
 	for (unsigned short i = 0; flags[i].longname; i++)
 	{
 		const size_t defFlagLen = (size_t) QuickInf[get_quick_access_for(flags[i].shortname)][1];
-		const size_t cmp = (length < defFlagLen) ? length : defFlagLen;
 
-		if (!strncmp(given, flags[i].longname, cmp))
+		if (length == defFlagLen && !strncmp(given, flags[i].longname, length))
 		{
 			flags[i].meta |= CXA_FLAG_WAS_SEEN;
 
