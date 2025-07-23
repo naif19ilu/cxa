@@ -97,7 +97,6 @@ struct Cxa *cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *
 	cxa->positional = (char**)      calloc(CXA_POS_ARGS_GROWTH_FAC, sizeof(char*));
 	cxa->len        = 0;
 	cxa->cap        = CXA_POS_ARGS_GROWTH_FAC;
-	cxa->stdinOpt   = NULL;
 
 	assert(cxa && "CANNOT ALLOC");
 	assert(cxa->positional && "CANNOT ALLOC");
@@ -126,9 +125,6 @@ struct Cxa *cxa_execute (const unsigned char argc, char **argv, struct CxaFlag *
 		{
 			check_flag_has_its_arg();
 			handle_long_flag(flags, this + 2);
-		}
-		else if (len == 1 && *this == '-')
-		{
 		}
 		else if (len >  1 && *this == '-')
 		{

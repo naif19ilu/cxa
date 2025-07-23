@@ -73,7 +73,6 @@ struct CxaFlag
 struct Cxa
 {
 	char          **positional;
-	char          *stdinOpt;
 	unsigned long len;
 	unsigned long cap;
 };
