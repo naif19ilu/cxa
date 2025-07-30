@@ -17,8 +17,5 @@
     -abc                   grouped short options
     --                     end of flag parsing (everything after is positional)
 
-	If you want to see an actual usage case see 'bc' repository
-	which includes this lib and uses all its capabilities
-
     naif19ta
     Jul 12 2025
